@@ -46,7 +46,20 @@ function generateMatrix() {
       row.addClass(row_direction_class);
       for (let j = 0; j < mat.size()[1]; j++) {
         let element = math.subset(mat, math.index(i, j));
-        row.append($("<td>"+element+"</td>"));
+        let theclass = "matrix-entry";
+        if (i == 0) {
+          theclass = theclass + " matrix-top";
+        }
+        if (i == mat.size()[0] - 1) {
+          theclass = theclass + " matrix-bottom";
+        }
+        if (j == 0) {
+          theclass = theclass + " matrix-left";
+        }
+        if (j == mat.size()[1] - 1) {
+          theclass = theclass + " matrix-right";
+        }
+        row.append($("<td class=\"" + theclass + "\">"+element+"</td>"));
       }
       rowDiv.append(row);
       tableBody.append(rowDiv);
@@ -56,12 +69,36 @@ function generateMatrix() {
       let row = $("<tr>");
       row.addClass(row_direction_class);
       for (let j = 0; j < mat.size()[1]; j++) {
-        let element = math.subset(mat, math.index(i, j))
-        row.append($("<td>"+element+"</td>"));
+        let element = math.subset(mat, math.index(i, j));
+        let theclass = "matrix-entry";
+        if (i == 0) {
+          theclass = theclass + " matrix-left";
+        }
+        if (i == mat.size()[0] - 1) {
+          theclass = theclass + " matrix-right";
+        }
+        if (j == 0) {
+          theclass = theclass + " matrix-top";
+        }
+        if (j == mat.size()[1] - 1) {
+          theclass = theclass + " matrix-bottom";
+        }
+        row.append($("<td class=\"" + theclass + "\">"+element+"</td>"));
       }
       tableBody.append(row);
     }
   }
+  
+  if (rows_sortable) {
+    $(".matrix-entry").css({"border-top": "1px solid red"}).css({"border-bottom": "1px solid red"}).css({"border-left": "1px solid white"}).css({"border-right": "1px solid white"});
+  }
+  else {
+    $(".matrix-entry").css({"border-top": "1px solid white"}).css({"border-bottom": "1px solid white"}).css({"border-left": "1px solid red"}).css({"border-right": "1px solid red"});
+  }
+  $(".matrix-top").css({"border-top": "1px solid red"});
+  $(".matrix-bottom").css({"border-bottom": "1px solid red"});
+  $(".matrix-left").css({"border-left": "1px solid red"});
+  $(".matrix-right").css({"border-right": "1px solid red"});
 }
 
 // Convert any string of values into a matrix
@@ -92,12 +129,13 @@ function toggleRowCol() {
   if (rows_sortable) {
     rows_sortable = false;
     row_direction_class = "rowsByCol";
-    toggleButton.html("Switch to Rows");
+    // toggleButton.html("Switch to Rows");
     generateMatrix();
   } else {
     rows_sortable = true;
     row_direction_class = "rowsByRow"
-    toggleButton.html("Switch to Columns");
+    // toggleButton.html("Switch to Columns");
     generateMatrix();
   }
 }
+
