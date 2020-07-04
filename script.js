@@ -52,6 +52,21 @@ function readAndGenerateMatrix() {
   createTable();
 }
 
+function printMatrix() {
+  strRows = [];
+  mat.forEach(function (row) {
+    strRows.push(row.join(' '));
+  });
+  
+  outputMat = strRows.join("\n");
+  outputGradedDegreesLeft = gradedDegreesLeft.join(" ");
+  outputGradedDegreesTop = gradedDegreesTop.join(" ");
+  
+  $('#read-matrix').val(outputMat);
+  $("#gradedDegsLeft").val(outputGradedDegreesLeft);
+  $("#gradedDegsTop").val(outputGradedDegreesTop);
+}
+
 // Create the matrix table
 function createTable() {
   $tableHead.empty();
@@ -181,21 +196,33 @@ function sortableByRows() {
 // Update the Interal Matrix as you make changes
 // to the one on the table
 function updateInteralMatrixByRow(oldPos, newPos) {
+  temp = gradedDegreesLeft[oldPos];
+  gradedDegreesLeft[oldPos] = gradedDegreesLeft[newPos];
+  gradedDegreesLeft[newPos] = temp;
+  
   for (let col=0; col < mat[0].length; col++){
     temp = mat[newPos][col];
     mat[newPos][col] = mat[oldPos][col];
     mat[oldPos][col] = temp;
   }
+  
+  printMatrix();
 }
 
 // Update the Interal Matrix as you make changes
 // to the one on the table
 function updateInteralMatrixByCol(oldPos, newPos) {
+  temp = gradedDegreesTop[oldPos];
+  gradedDegreesTop[oldPos] = gradedDegreesTop[newPos];
+  gradedDegreesTop[newPos] = temp;
+  
   for (let row=0; row < mat.length; row++){
     temp = mat[row][newPos];
     mat[row][newPos] = mat[row][oldPos];
     mat[row][oldPos] = temp;
   }
+  
+  printMatrix();
 }
 
 function cleanUp() {
