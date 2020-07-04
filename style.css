@@ -5,78 +5,72 @@ body {
 
 .container {
   width: 960px;
-  border: 2px solid blue;
   overflow: auto;
+  border: 2px solid blue;
   margin: 0 auto;
   text-align: center;
 }
 
 #matrix-input {
   width: 900px;
-  height: 500px;
+  max-height: 500px;
   border: 2px solid red;
   margin: 10px auto;
+}
+
+#read-matrix {
+  margin: 10px;
 }
 
 #matrix-output {
   width: 900px;
   border: 2px solid red;
-  overflow: auto;
   margin: 10px auto;
 }
 
-#matrix-table {
-  margin: 10px 200px;
-  border-spacing: 0;
-  border-collapse: collapse;
-  display: block;
+#matrix-container {
+  margin: 10px;
+  max-height: 500px;
   overflow: auto;
-  white-space: nowrap;
 }
 
-#matrix-body tr {
-  display: inline-flex;
-}
-
-#matrix-body tr td {
-  text-align: center;
-  /*border: 1px solid red;*/
+#matrix-table {
+  cursor: default;
   border-collapse: collapse;
+  text-align: center;
+  /*border: 2px solid red;*/
+  margin: 10px auto;
+}
+
+#matrix-head th,
+#matrix-head td,
+#matrix-body tr td,
+#matrix-body tr th {
+  vertical-align: middle;
+  padding: 10px;
   width: 50px;
-  height: 50px;
 }
 
-.rowsByCol {
-  flex-direction: column;
-}
-
-.rowsByRow {
-  flex-direction: row;
-}
-
-.matrix-entry {
-  border-top: 1px solid red;
-}
-
-.matrix-top {
-  border-top: 1px solid red;
-}
-
-.matrix-bottom {
+.by-rows {
   border-bottom: 1px solid red;
+  border-top: 1px solid red;
 }
 
-.matrix-left {
+.by-cols {
   border-left: 1px solid red;
+  border-right: 1px solid red;
 }
 
-.matrix-right {
-  border-right: 1px solid red;
+.ui-state-highlight {
+  background: #EEE;
+  border: 1px solid #777;
+}
+
+.ui-sortable-helper {
+  background: #FFF;
+  border: 1px solid #CCC;
 }
 
 #options {
   margin: 10px;
-}
-#options button {
-  display: inline-block;
 }

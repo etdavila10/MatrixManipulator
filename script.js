@@ -1,141 +1,204 @@
-// start the matrix in
-
-let raw;
 let mat;
-let gradedDegrees = [1, 2, 3, 4];
+let gradedDegreesLeft;
+let gradedDegreesTop;
 
 // create variables for DOM elments we will be targeting
-let tableBody = $("#matrix-body");
-let allRowElements = $("#matrix-body tr");
-let optionButtons = $("#options button");
-let toggleButton = $("#toggle");
+let $tableMain = $("#matrix-table");
+let $tableHead = $("#matrix-head");
+let $tableBody = $("#matrix-body");
+let $optionButtons = $("#options button");
+let $toggleButton = $("#toggle");
 
-// the class that determines whether the table is being
-// represented by rows or by cols
-let row_direction_class = "rowsByCol";
-
-// boolean to determine whether rows are sortable or not
-let rows_sortable = false;
+let oldPos;
+let newPos;
 
 // once the page loads the table will be made sortable
 // and the matrix will be generated for the matrix in
 // the textarea
 $(document).ready(function() {
-  tableBody.sortable({
-    stop: function( event, ui ) {
-      console.log("ui object:", ui);
+  readInput();
+  createTable();
+  $(document).keydown(function(event) {
+    if (event.keyCode == 16) {
+      $tableHead.sortable('disable');
+      $tableBody.sortable('enable');
+      switchToRows();
     }
   });
-
-  generateMatrix();
+  $(document).keyup(function(event) {
+    if (event.keyCode == 16) {
+      $tableHead.sortable('enable');
+      $tableBody.sortable('disable');
+      switchToCols();
+    }
+  });
 });
 
-// This will convert the input given in the textarea and
-// convert it to the matrix table
-function generateMatrix() {
-  // clear anything being displayed in the matrix table
-  tableBody.empty();
-  raw = $("#matrix").val();
-  // get the input from textarea and set it to mat
-  mat = convertStringToMatrix(raw);
-
-  if (rows_sortable) {
-    for (let i = 0; i < mat.size()[0]; i++) {
-      let rowDiv = $("<div>");
-      let row = $("<tr>");
-      row.addClass(row_direction_class);
-      for (let j = 0; j < mat.size()[1]; j++) {
-        let element = math.subset(mat, math.index(i, j));
-        let theclass = "matrix-entry";
-        if (i == 0) {
-          theclass = theclass + " matrix-top";
-        }
-        if (i == mat.size()[0] - 1) {
-          theclass = theclass + " matrix-bottom";
-        }
-        if (j == 0) {
-          theclass = theclass + " matrix-left";
-        }
-        if (j == mat.size()[1] - 1) {
-          theclass = theclass + " matrix-right";
-        }
-        row.append($("<td class=\"" + theclass + "\">"+element+"</td>"));
-      }
-      rowDiv.append(row);
-      tableBody.append(rowDiv);
-    }
-  } else {
-    for (let i = 0; i < mat.size()[0]; i++) {
-      let row = $("<tr>");
-      row.addClass(row_direction_class);
-      for (let j = 0; j < mat.size()[1]; j++) {
-        let element = math.subset(mat, math.index(i, j));
-        let theclass = "matrix-entry";
-        if (i == 0) {
-          theclass = theclass + " matrix-left";
-        }
-        if (i == mat.size()[0] - 1) {
-          theclass = theclass + " matrix-right";
-        }
-        if (j == 0) {
-          theclass = theclass + " matrix-top";
-        }
-        if (j == mat.size()[1] - 1) {
-          theclass = theclass + " matrix-bottom";
-        }
-        row.append($("<td class=\"" + theclass + "\">"+element+"</td>"));
-      }
-      tableBody.append(row);
-    }
-  }
-  
-  if (rows_sortable) {
-    $(".matrix-entry").css({"border-top": "1px solid red"}).css({"border-bottom": "1px solid red"}).css({"border-left": "1px solid white"}).css({"border-right": "1px solid white"});
-  }
-  else {
-    $(".matrix-entry").css({"border-top": "1px solid white"}).css({"border-bottom": "1px solid white"}).css({"border-left": "1px solid red"}).css({"border-right": "1px solid red"});
-  }
-  $(".matrix-top").css({"border-top": "1px solid red"});
-  $(".matrix-bottom").css({"border-bottom": "1px solid red"});
-  $(".matrix-left").css({"border-left": "1px solid red"});
-  $(".matrix-right").css({"border-right": "1px solid red"});
+// Read the input provided in the textarea section
+function readInput() {
+  finalOutput = [];
+  raw = $("#read-matrix").val();
+  rows = raw.split(/\n/);
+  rows.forEach(function (row) {
+    finalOutput.push(row.trim().split(/\s/));
+  });
+  mat = finalOutput;
+  gradedDegreesLeft = $("#gradedDegsLeft").val().trim().split(/\s/);
+  gradedDegreesTop = $("#gradedDegsTop").val().trim().split(/\s/);
 }
 
-// Convert any string of values into a matrix
-function convertStringToMatrix(rawstring) {
-  let rows = rawstring.split('\n');
-  for (let i = 0; i < rows.length; i++) {
-    rows[i] = rows[i].split(' ');
+function readAndGenerateMatrix() {
+  readInput();
+  createTable();
+}
+
+// Create the matrix table
+function createTable() {
+  $tableHead.empty();
+  $tableBody.empty();
+  $tableHead.append('<td><strong>GrDegs</strong></td>');
+  for (let col=0; col < gradedDegreesTop.length; col++) {
+    $tableHead.append('<th order="' + gradedDegreesTop[col] + '" id="col' + gradedDegreesTop[col] + '">' + gradedDegreesTop[col] + '</th>');
   }
 
-  if (rows_sortable) {
-    return math.matrix(rows);
-  } else {
-    return math.transpose(math.matrix(rows));
+  for (let row=0; row < mat.length; row++) {
+    let tableRow = '<tr>';
+    tableRow += '<th>' + gradedDegreesLeft[row] + '</th>';
+    for (let col=0; col < mat[0].length; col++) {
+      tableRow += '<td class="by-cols">' + mat[row][col] + '</td>';
+    }
+    tableRow += '</tr>';
+    $tableBody.append(tableRow);
+  }
+  sortableByRows();
+  $tableBody.sortable('disable');
+  sortableByColumns();
+}
+
+function switchToRows() {
+  $tableBody.find('td').each(function () {
+    $(this).removeClass("by-cols");
+    $(this).addClass("by-rows");
+  });
+}
+
+function switchToCols() {
+  $tableBody.find('td').each(function () {
+    $(this).removeClass("by-rows");
+    $(this).addClass("by-cols");
+  });
+}
+
+function sortableByColumns() {
+  // make the table sortable by the headers and make the columns follow as the
+  // headers move
+  $tableHead.sortable({
+    axis: "x" ,
+    items: 'th',
+    cursor: 'move',
+    helper: 'clone',
+    distance: 1,
+    opacity: 0.8,
+    placeholder: 'ui-state-highlight',
+    // when selecting a column to sort this makes sure to grab its index
+    // before moving it
+    start: function(event, ui) {
+        startPos = $tableHead.find('th').index(ui.item);
+        console.log($tableHead.find('th'));
+        oldPos = startPos;
+    },
+    // instead of on change we should do something on stop so that it can do
+    // it all in one go once you let go of the column header
+    change: function(event, ui) {
+        // Get position of the placeholder
+        let newPos = $tableHead.find('th').index($tableHead.find('th.ui-state-highlight'));
+
+        // If the position is right of the original position, substract it by one in cause of the hidden th
+        if (newPos>startPos) newPos--;
+        updateInteralMatrixByCol(oldPos, newPos);
+
+        // move all the row elements
+        $tableBody.find('tr').find('td:eq(' + oldPos + ')').each(function() {
+            let tdElement = $(this);
+            let tdElementParent = tdElement.parent();
+            if(newPos>oldPos)// Move it the right
+                tdElementParent.find('td:eq(' + newPos + ')').after(tdElement);
+            else// Move it the left
+                tdElementParent.find('td:eq(' + newPos + ')').before(tdElement);
+        });
+        oldPos = newPos;
+    },
+  });
+}
+
+function sortableByRows() {
+    $tableBody.sortable({
+    axis: "y" ,
+    items: 'tr',
+    cursor: 'move',
+    helper: 'clone',
+    distance: 1,
+    opacity: 0.8,
+    placeholder: 'ui-state-highlight'
+    // when selecting a column to sort this makes sure to grab its index
+    // before moving it
+    // start: function(event, ui) {
+    //     startPos = $tableBody.find('th').index(ui.item);
+    //     console.log($tableBody.find('th'));
+    //     console.log(startPos);
+    //     oldPos = startPos;
+    // },
+    // // instead of on change we should do something on stop so that it can do
+    // // it all in one go once you let go of the column header
+    // change: function(event, ui) {
+    //     // Get position of the placeholder
+    //     let newPos = $tableBody.find('th').index($tableBody.find('th.ui-state-highlight'));
+
+    //     // If the position is right of the original position, substract it by one in cause of the hidden th
+    //     if (newPos>startPos) newPos--;
+    //     updateInteralMatrixByRow(oldPos, newPos);
+
+    //     // move all the row elements
+    //     // $tableBody.find('tr').find('td:eq(' + oldPos + ')').each(function() {
+    //     //     let tdElement = $(this);
+    //     //     let tdElementParent = tdElement.parent();
+    //     //     if(newPos>oldPos)// Move it the right
+    //     //         tdElementParent.find('td:eq(' + newPos + ')').after(tdElement);
+    //     //     else// Move it the left
+    //     //         tdElementParent.find('td:eq(' + newPos + ')').before(tdElement);
+    //     // });
+
+    //     let trOld = $('tr:eq(' + oldPos + ')');
+    //     if (newPos > oldPos)
+    //       $('tr:eq(' + newPos + ')').after(trOld);
+    //     else
+    //       $('tr:eq(' + newPos + ')').before(trOld);
+    //     oldPos = newPos;
+    // }
+  });
+}
+
+// Update the Interal Matrix as you make changes
+// to the one on the table
+function updateInteralMatrixByRow(oldPos, newPos) {
+  for (let col=0; col < mat[0].length; col++){
+    temp = mat[newPos][col];
+    mat[newPos][col] = mat[oldPos][col];
+    mat[oldPos][col] = temp;
   }
 }
 
-function updateFreeResolution() {
-  alert('ToDo: link this with the internal free resolution');
+// Update the Interal Matrix as you make changes
+// to the one on the table
+function updateInteralMatrixByCol(oldPos, newPos) {
+  for (let row=0; row < mat.length; row++){
+    temp = mat[row][newPos];
+    mat[row][newPos] = mat[row][oldPos];
+    mat[row][oldPos] = temp;
+  }
 }
 
 function cleanUp() {
-  tableBody.empty();
+  $tableBody.empty();
+  $tableHead.empty();
 }
-
-function toggleRowCol() {
-  mat = math.transpose(mat);
-
-  if (rows_sortable) {
-    rows_sortable = false;
-    row_direction_class = "rowsByCol";
-    // toggleButton.html("Switch to Rows");
-    generateMatrix();
-  } else {
-    rows_sortable = true;
-    row_direction_class = "rowsByRow"
-    // toggleButton.html("Switch to Columns");
-    generateMatrix();
-  }
-}
-
