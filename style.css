@@ -52,17 +52,17 @@ body {
 }
 
 .by-rows {
+  border-left: 1px solid rgba(0, 0, 0, 0);
+  border-right: 1px solid rgba(0, 0, 0, 0);
   border-bottom: 1px solid red;
   border-top: 1px solid red;
-  border-left: 1px solid white;
-  border-right: 1px solid white;
 }
 
 .by-cols {
   border-left: 1px solid red;
   border-right: 1px solid red;
-  border-bottom: 1px solid white;
-  border-top: 1px solid white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
+  border-top: 1px solid rgba(0, 0, 0, 0);
 }
 
 .ui-state-highlight {
