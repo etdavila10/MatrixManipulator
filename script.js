@@ -171,14 +171,35 @@ function makeSortable(direction, internalUpdater) {
       let $draggable = ui.draggable;
       let $draggableParent = $draggable.parent();
       let $dropContainer = $(this);
+      oldPos = parseInt($draggableParent.attr('index'));
+      newPos = parseInt($dropContainer.attr('index'));
+
+      if (oldPos < newPos) {
+        let $curDraggable = $draggable;
+        let $nextDraggable = $dropContainer.children();
+        $dropContainer.append($curDraggable);
+
+        for (let i=newPos; i > oldPos; i--) {
+          $curDraggable = $nextDraggable;
+          $nextContainer = $("[index=" + (i-1) + "]");
+          $nextDraggable = $nextContainer.children();
+          $nextContainer.append($curDraggable);
+        }
+      } else {
+        let $curDraggable = $draggable;
+        let $nextDraggable = $dropContainer.children();
+        $dropContainer.append($curDraggable);
+
+        for (let i=newPos; i < oldPos; i++) {
+          $curDraggable = $nextDraggable;
+          $nextContainer = $("[index=" + (i+1) + "]");
+          $nextDraggable = $nextContainer.children();
+          $nextContainer.append($curDraggable);
+        }
+      }
 
       $draggable.css({ "left":0, "top":0 });
 
-      $draggableParent.append($dropContainer.children());
-      $dropContainer.append($draggable);
-
-      oldPos = $draggableParent.attr('index');
-      newPos = $dropContainer.attr('index');
       internalUpdater(oldPos, newPos);
     }
   });
@@ -219,14 +240,12 @@ function updateInternalMatrixNeg(index, direction) {
 // to the one on the table
 function updateInteralMatrixByRow(oldPos, newPos) {
   temp = gradedDegreesLeft[oldPos];
-  gradedDegreesLeft[oldPos] = gradedDegreesLeft[newPos];
-  gradedDegreesLeft[newPos] = temp;
+  gradedDegreesLeft.splice(oldPos, 1);
+  gradedDegreesLeft.splice(newPos, 0, temp);
 
-  for (let col=0; col < mat[0].length; col++){
-    temp = mat[newPos][col];
-    mat[newPos][col] = mat[oldPos][col];
-    mat[oldPos][col] = temp;
-  }
+  temp = mat[oldPos];
+  mat.splice(oldPos, 1);
+  mat.splice(newPos, 0, temp);
 
   printMatrix();
 }
@@ -235,13 +254,13 @@ function updateInteralMatrixByRow(oldPos, newPos) {
 // to the one on the table
 function updateInteralMatrixByCol(oldPos, newPos) {
   temp = gradedDegreesTop[oldPos];
-  gradedDegreesTop[oldPos] = gradedDegreesTop[newPos];
-  gradedDegreesTop[newPos] = temp;
+  gradedDegreesTop.splice(oldPos, 1);
+  gradedDegreesTop.splice(newPos, 0, temp);
 
   for (let row=0; row < mat.length; row++){
-    temp = mat[row][newPos];
-    mat[row][newPos] = mat[row][oldPos];
-    mat[row][oldPos] = temp;
+    temp = mat[row][oldPos];
+    mat[row].splice(oldPos, 1);
+    mat[row].splice(newPos, 0, temp);
   }
 
   printMatrix();
@@ -273,4 +292,13 @@ function updateInteralMatrixByColAdder(oldPos, newPos) {
   }
 
   printMatrix();
+}
+
+function range(start, stop) {
+  let rangeArray = [];
+
+  for (i = start; i < stop; i++) {
+    rangeArray.push(i);
+  }
+  return rangeArray
 }
