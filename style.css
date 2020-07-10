@@ -14,7 +14,6 @@ body {
 #matrix-input {
   width: 900px;
   max-height: 500px;
-  /*border: 2px solid red;*/
   margin: 10px auto;
 }
 
@@ -24,7 +23,6 @@ body {
 
 #matrix-output {
   width: 900px;
-  /*border: 2px solid red;*/
   margin: 10px auto;
 }
 
@@ -44,6 +42,19 @@ body {
 #matrix-body tr td {
   margin: 0;
   padding: 0;
+}
+
+.by-rows {
+  border-left: 1px solid rgba(0, 0, 0, 0);
+  border-right: 1px solid rgba(0, 0, 0, 0);
+  border-bottom: 1px solid #3b6978;
+  border-top: 1px solid #3b6978;
+}
+
+.by-cols {
+  border-left: 1px solid #3b6978;
+  border-right: 1px solid #3b6978;
+  border-bottom: 1px solid rgba(0, 0, 0, 0);
 }
 
 .inner-table {
@@ -67,29 +78,18 @@ body {
   border-bottom: 1px solid rgba(0, 0, 0, 0);
 }
 
-.by-rows {
-  border-left: 1px solid rgba(0, 0, 0, 0);
-  border-right: 1px solid rgba(0, 0, 0, 0);
-  border-bottom: 1px solid #3b6978;
-  border-top: 1px solid #3b6978;
+.draggable {
+  background: #AFA;
 }
 
-.by-cols {
-  border-left: 1px solid #3b6978;
-  border-right: 1px solid #3b6978;
-  border-bottom: 1px solid rgba(0, 0, 0, 0);
-}
-
-.ui-state-highlight {
+.drop-hover {
   background: #EEE;
-  border: 1px solid #777;
-}
-
-.ui-sortable-helper {
-  background: #FFF;
-  border: 1px solid #CCC;
 }
 
 #options {
   margin: 10px;
+}
+
+.active {
+  background: #AFA;
 }

@@ -71,13 +71,13 @@ function createTable() {
   // By Columns
   if (!shiftPressed) {
     let tableRow = '<tr>';
-    tableRow += '<td id="border-maker" class="by-cols"><table class="inner-table"><tr id="inner-border-maker" class="inner-border-col"><th>GrDgs</th></tr>';
+    tableRow += '<th id="border-maker" class="by-cols"><table class="inner-table"><tr id="inner-border-maker" class="inner-border-col"><th>GrDgs</th></tr>';
     for (let i=0; i < gradedDegreesLeft.length; i++) {
       tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + gradedDegreesLeft[i] + '</th></tr>';
     }
-    tableRow += '</table></td>';
+    tableRow += '</table></th>';
     for (let col=0; col < mat[0].length; col++) {
-      tableRow += '<td id="border-maker" class="by-cols movers"><table class="inner-table">';
+      tableRow += '<td index='+ col +' id="border-maker" class="by-cols" onclick="multByNegOne(this, 1)"><table class="inner-table">';
       tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + gradedDegreesTop[col] + '</th></tr>';
       for (let row=0; row < mat.length; row++) {
         tableRow += '<tr id="inner-border-maker" class="inner-border-col"><td>' + mat[row][col] + '</td></tr>';
@@ -86,17 +86,17 @@ function createTable() {
     }
     tableRow += '</tr>';
     $tableBody.append(tableRow);
-    sortableByColumns();
+    makeSortable('x', updateInteralMatrixByCol);
   // By Rows
   } else {
     let tableRow;
-    tableRow += '<tr id="border-maker" class="by-rows"><td><table class="inner-table"><tr><th id="inner-border-maker" class="inner-border-row">GrDgs</th>';
+    tableRow += '<tr id="border-maker" class="by-rows"><th><table class="inner-table"><tr><th id="inner-border-maker" class="inner-border-row">GrDgs</th>';
     for (let i=0; i < gradedDegreesTop.length; i++) {
       tableRow += '<th id="inner-border-maker" class="inner-border-row">' + gradedDegreesTop[i] + '</th>';
     }
-    tableRow += '</tr></table></td></tr>'
+    tableRow += '</tr></table></th></tr>'
     for (let row=0; row < mat.length; row++) {
-      tableRow += '<tr id="border-maker" class="by-rows movers"><td><table class="inner-table"><tr>';
+      tableRow += '<tr id="border-maker" class="by-rows movers" onclick="multByNegOne(this, 0)"><td index=' + row + '><table class="inner-table"><tr>';
       tableRow += '<th id="inner-border-maker" class="inner-border-row">' + gradedDegreesLeft[row] + '</th>';
       for (let col=0; col < mat[0].length; col++) {
         tableRow += '<td id="inner-border-maker" class="inner-border-row">' + mat[row][col] + '</td>';
@@ -104,7 +104,7 @@ function createTable() {
       tableRow += '</tr></table></td></tr>';
     }
     $tableBody.append(tableRow);
-    sortableByRows();
+    makeSortable('y', updateInteralMatrixByRow);
   }
 }
 
@@ -128,96 +128,91 @@ function switchToCols() {
     $(this).removeClass("inner-border-row");
     $(this).addClass("inner-border-col");
   });
-
 }
 
-function sortableByColumns() {
+function toggleRowsColumns() {
+  if (!shiftPressed) {
+    shiftPressed = true;
+    switchToRows();
+    createTable();
+  }
+  else if (shiftPressed) {
+    shiftPressed = false;
+    switchToCols();
+    createTable();
+  }
+}
+
+function cleanUp() {
+  $tableBody.empty();
+}
+
+function makeSortable(direction, internalUpdater) {
   // make the table sortable by the headers and make the columns follow as the
   // headers move
-  $tableBody.sortable({
-    axis: "x" ,
-    items: '.movers',
+  $("#matrix-body>tr>td>table").draggable({
+    axis: direction,
     cursor: 'move',
-    helper: 'clone',
-    distance: 1,
-    opacity: 0.8,
-    // placeholder: 'ui-state-highlight',
-    // when selecting a column to sort this makes sure to grab its index
-    // before moving it
-    // start: function(event, ui) {
-    //     startPos = $tableHead.find('th').index(ui.item);
-    //     console.log($tableHead.find('th'));
-    //     oldPos = startPos;
-    // },
-    // // instead of on change we should do something on stop so that it can do
-    // // it all in one go once you let go of the column header
-    // change: function(event, ui) {
-    //     // Get position of the placeholder
-    //     let newPos = $tableHead.find('th').index($tableHead.find('th.ui-state-highlight'));
+    revert: 'invalid',
+    revertDuration: 300,
+    opacity: 0.6,
+    zIndex: 10,
+    start: function(event, ui) {
+      $(this).addClass("draggable");
+    },
+    stop: function(event, ui) {
+      $(this).removeClass("draggable");
+    }
+  });
 
-    //     // If the position is right of the original position, substract it by one in cause of the hidden th
-    //     if (newPos>startPos) newPos--;
-    //     updateInteralMatrixByCol(oldPos, newPos);
+  $("#matrix-body>tr>td").droppable({
+    hoverClass: 'drop-hover',
+    drop: function (event, ui) {
+      let $draggable = ui.draggable;
+      let $draggableParent = $draggable.parent();
+      let $dropContainer = $(this);
 
-    //     // move all the row elements
-    //     $tableBody.find('tr').find('td:eq(' + oldPos + ')').each(function() {
-    //         let tdElement = $(this);
-    //         let tdElementParent = tdElement.parent();
-    //         if(newPos>oldPos)// Move it the right
-    //             tdElementParent.find('td:eq(' + newPos + ')').after(tdElement);
-    //         else// Move it the left
-    //             tdElementParent.find('td:eq(' + newPos + ')').before(tdElement);
-    //     });
-    //     oldPos = newPos;
-    // },
+      $draggable.css({ "left":0, "top":0 });
+
+      $draggableParent.append($dropContainer.children());
+      $dropContainer.append($draggable);
+
+      oldPos = $draggableParent.attr('index');
+      newPos = $dropContainer.attr('index');
+      internalUpdater(oldPos, newPos);
+    }
   });
 }
 
-function sortableByRows() {
-    $tableBody.sortable({
-    axis: "y" ,
-    items: '.movers',
-    cursor: 'move',
-    helper: 'clone',
-    distance: 1,
-    opacity: 0.8,
-    // placeholder: 'ui-state-highlight'
-    // when selecting a column to sort this makes sure to grab its index
-    // before moving it
-    // start: function(event, ui) {
-    //     startPos = $tableBody.find('th').index(ui.item);
-    //     console.log($tableBody.find('th'));
-    //     console.log(startPos);
-    //     oldPos = startPos;
-    // },
-    // // instead of on change we should do something on stop so that it can do
-    // // it all in one go once you let go of the column header
-    // change: function(event, ui) {
-    //     // Get position of the placeholder
-    //     let newPos = $tableBody.find('th').index($tableBody.find('th.ui-state-highlight'));
+function multByNegOne(element, direction) {
+  if (direction == 1) {
+    $element = $tableBody.find(element);
+    index = $tableBody.find(">tr>td").index($element);
+    $element.find(">table>tbody>tr>td").each(function() {
+      this.innerHTML *= -1;
+    });
+    updateInternalMatrixNeg(index, 'col');
+  } else if (direction == 0) {
+    $element = $tableBody.find(element);
+    index = $tableBody.find(".movers").index($element);
+    $element.find('>td>table>tbody>tr>td').each(function() {
+      this.innerHTML *= -1;
+    });
+    updateInternalMatrixNeg(index, 'row');
+  }
+}
 
-    //     // If the position is right of the original position, substract it by one in cause of the hidden th
-    //     if (newPos>startPos) newPos--;
-    //     updateInteralMatrixByRow(oldPos, newPos);
-
-    //     // move all the row elements
-    //     // $tableBody.find('tr').find('td:eq(' + oldPos + ')').each(function() {
-    //     //     let tdElement = $(this);
-    //     //     let tdElementParent = tdElement.parent();
-    //     //     if(newPos>oldPos)// Move it the right
-    //     //         tdElementParent.find('td:eq(' + newPos + ')').after(tdElement);
-    //     //     else// Move it the left
-    //     //         tdElementParent.find('td:eq(' + newPos + ')').before(tdElement);
-    //     // });
-
-    //     let trOld = $('tr:eq(' + oldPos + ')');
-    //     if (newPos > oldPos)
-    //       $('tr:eq(' + newPos + ')').after(trOld);
-    //     else
-    //       $('tr:eq(' + newPos + ')').before(trOld);
-    //     oldPos = newPos;
-    // }
-  });
+function updateInternalMatrixNeg(index, direction) {
+  if (direction == 'col') {
+    for (let row=0; row < mat.length; row++) {
+      mat[row][index] *= -1;
+    }
+  } else if (direction == 'row') {
+    for (let col=0; col < mat[0].length; col++) {
+      mat[index][col] *= -1;
+    }
+  }
+  printMatrix();
 }
 
 // Update the Interal Matrix as you make changes
@@ -252,7 +247,30 @@ function updateInteralMatrixByCol(oldPos, newPos) {
   printMatrix();
 }
 
-function cleanUp() {
-  $tableBody.empty();
-  $tableHead.empty();
+function updateInteralMatrixByRowAdder(oldPos, newPos) {
+  temp = gradedDegreesLeft[oldPos];
+  gradedDegreesLeft[oldPos] = gradedDegreesLeft[newPos];
+  gradedDegreesLeft[newPos] = temp;
+
+  for (let col=0; col < mat[0].length; col++){
+    temp = mat[newPos][col];
+    mat[newPos][col] = mat[oldPos][col];
+    mat[oldPos][col] = temp;
+  }
+
+  printMatrix();
+}
+
+function updateInteralMatrixByColAdder(oldPos, newPos) {
+  temp = gradedDegreesTop[oldPos];
+  gradedDegreesTop[oldPos] = gradedDegreesTop[newPos];
+  gradedDegreesTop[newPos] = temp;
+
+  for (let row=0; row < mat.length; row++){
+    temp = mat[row][newPos];
+    mat[row][newPos] = mat[row][oldPos];
+    mat[row][oldPos] = temp;
+  }
+
+  printMatrix();
 }

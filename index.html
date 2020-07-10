@@ -17,6 +17,10 @@
   <div class="container">
     <h1>Matrix Editor</h1>
     <div id="matrix-input">
+      <label for="num-of-matrices">Number of Matrices</label>
+      <input name="num-of-matrices" type="number">
+      <button style="margin: 10px;">Update Inputs</button>
+      <br>
       <textarea name="read-matrix" id="read-matrix" cols="50" rows="10">1 2 3 4 5
 21 22 23 24 25
 6 7 8 9 10
@@ -31,7 +35,7 @@
       <input type="text" name="gradedDegsTop" id="gradedDegsTop" value="3 6 10 15 17">
       <br>
       <br>
-      <button onclick="readAndGenerateMatrix()" style="margin: 10px;">Generate Matrix</button>
+      <button onclick="readAndGenerateMatrix()" style="margin: 10px;">Generate Matrices</button>
     </div>
     <div id="matrix-output">
       <div id="matrix-container">
@@ -41,10 +45,10 @@
         </table>
       </div>
         <div id="options">
-          <button onclick="">Add/Subtract</button>
-          <button onclick="">Permute</button>
-          <button onclick="">Rows/Cols</button>
-          <button onclick="cleanUp()">Clear</button>
+          <button id="add" onclick="">Add Rows/Cols</button>
+          <button id="permute" onclick="" class="active">Permute Rows/Cols</button>
+          <button id="toggle" onclick="toggleRowsColumns()">Toggle Rows/Cols</button>
+          <button id="clean" onclick="cleanUp()">Clear</button>
         </div>
     </div>
   </div>
