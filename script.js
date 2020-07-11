@@ -2,6 +2,7 @@ let mat;
 let gradedDegreesLeft;
 let gradedDegreesTop;
 let shiftPressed = false;
+let ctrlPressed = false;
 
 // create variables for DOM elments we will be targeting
 let $tableMain = $("#matrix-table");
@@ -27,6 +28,18 @@ $(document).ready(function() {
     else if (event.keyCode == 16 && shiftPressed) {
       shiftPressed = false;
       switchToCols();
+      createTable();
+    }
+    if (event.keyCode == 17 && !ctrlPressed) {
+      ctrlPressed = true;
+      $("#permute").removeClass("active");
+      $("#add").addClass("active");
+      createTable();
+    }
+    else if (event.keyCode == 17 && ctrlPressed) {
+      ctrlPressed = false;
+      $("#add").removeClass("active");
+      $("#permute").addClass("active");
       createTable();
     }
   });
@@ -86,10 +99,14 @@ function createTable() {
     }
     tableRow += '</tr>';
     $tableBody.append(tableRow);
-    makeSortable('x', function(oldPos, newPos) {
-      updateInteralMatrixByCol(oldPos, newPos);
-      animateSwitchCol(oldPos, newPos);
-    });
+    if (!ctrlPressed) {
+      makeSortable('x', function(oldPos, newPos) {
+        updateInteralMatrixByCol(oldPos, newPos);
+        animateSwitchCol(oldPos, newPos);
+      });
+    } else {
+      makeScalable('x', gradedDegreesTop, updateInteralMatrixByColAdder);
+    }
   // By Rows
   } else {
     let tableRow;
@@ -107,10 +124,14 @@ function createTable() {
       tableRow += '</tr></table></td></tr>';
     }
     $tableBody.append(tableRow);
-    makeSortable('y', function(oldPos, newPos) {
-      updateInteralMatrixByRow(oldPos, newPos);
-      animateSwitchRow(oldPos, newPos);
-    });
+    if (!ctrlPressed) {
+      makeSortable('y', function(oldPos, newPos) {
+        updateInteralMatrixByRow(oldPos, newPos);
+        animateSwitchRow(oldPos, newPos);
+      });
+    } else {
+      makeScalable('y', gradedDegreesLeft, updateInternalMatrixByRowAdder);
+    }
   }
 }
 
@@ -151,6 +172,54 @@ function toggleRowsColumns() {
 
 function cleanUp() {
   $tableBody.empty();
+}
+
+function makeScalable(direction, affectedBettis, internalUpdater) {
+  // make the table sortable by the headers and make the columns follow as the
+  // headers move
+  $("#matrix-body>tr>td>table").draggable({
+    axis: direction,
+    cursor: 'move',
+    revert: 'invalid',
+    revertDuration: 300,
+    opacity: 0.6,
+    zIndex: 10,
+    start: function(event, ui) {
+      $(this).addClass("draggable");
+    },
+    stop: function(event, ui) {
+      $(this).removeClass("draggable");
+    }
+  });
+
+  $("#matrix-body>tr>td").droppable({
+    hoverClass: 'drop-hover',
+    drop: function (event, ui) {
+      let $draggable = ui.draggable;
+      let $draggableParent = $draggable.parent();
+      let $dropContainer = $(this);
+
+      oldPos = parseInt($draggableParent.attr('index'));
+      newPos = parseInt($dropContainer.attr('index'));
+
+      $draggable.css({ "left":0, "top":0 });
+
+      let $draggableElements = $draggable.find("tbody>tr>");
+      let $targetElements = $dropContainer.children().find("tbody>tr>");
+
+      // console.log($draggable.find("tbody>tr>"));
+
+      let i = 0;
+      while (i < $draggableElements.length) {
+        let targetValue = parseInt($targetElements[i].innerHTML);
+        let draggedValue = parseInt($draggableElements[i].innerHTML);
+        $targetElements[i].innerHTML = targetValue + draggedValue;
+        i++;
+      }
+
+      // internalUpdater(oldPos, newPos);
+    }
+  });
 }
 
 function makeSortable(direction, internalUpdater) {
@@ -221,7 +290,7 @@ function animateSwitchRow(oldPos, newPos) {
     $('.switchslide').animate({
       'top': 0
     }, {
-      duration: 100, 
+      duration: 100,
       // avoids (some) flickering
       step: function(now, fx) {
         fx.now = parseInt(now);
@@ -239,7 +308,7 @@ function animateSwitchRow(oldPos, newPos) {
     $('.switchslide').animate({
       'bottom': 0
     }, {
-      duration: 100, 
+      duration: 100,
       // avoids (some) flickering
       step: function(now, fx) {
         fx.now = parseInt(now);
@@ -260,7 +329,7 @@ function animateSwitchCol(oldPos, newPos) {
     $('.switchslide').animate({
       'left': 0
     }, {
-      duration: 100, 
+      duration: 100,
       complete: function() {
         $(this).css({'left': '', 'position': ''});
     }});
@@ -274,7 +343,7 @@ function animateSwitchCol(oldPos, newPos) {
     $('.switchslide').animate({
       'right': 0
     }, {
-      duration: 100, 
+      duration: 100,
       complete: function() {
         $(this).css({'right': '', 'position': ''});
     }});
@@ -342,7 +411,7 @@ function updateInteralMatrixByCol(oldPos, newPos) {
   printMatrix();
 }
 
-function updateInteralMatrixByRowAdder(oldPos, newPos) {
+function updateInternalMatrixByRowAdder(oldPos, newPos) {
   temp = gradedDegreesLeft[oldPos];
   gradedDegreesLeft[oldPos] = gradedDegreesLeft[newPos];
   gradedDegreesLeft[newPos] = temp;
