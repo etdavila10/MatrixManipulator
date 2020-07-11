@@ -86,7 +86,10 @@ function createTable() {
     }
     tableRow += '</tr>';
     $tableBody.append(tableRow);
-    makeSortable('x', updateInteralMatrixByCol);
+    makeSortable('x', function(oldPos, newPos) {
+      updateInteralMatrixByCol(oldPos, newPos);
+      animateSwitchCol(oldPos, newPos);
+    });
   // By Rows
   } else {
     let tableRow;
@@ -104,7 +107,10 @@ function createTable() {
       tableRow += '</tr></table></td></tr>';
     }
     $tableBody.append(tableRow);
-    makeSortable('y', updateInteralMatrixByRow);
+    makeSortable('y', function(oldPos, newPos) {
+      updateInteralMatrixByRow(oldPos, newPos);
+      animateSwitchRow(oldPos, newPos);
+    });
   }
 }
 
@@ -203,6 +209,76 @@ function makeSortable(direction, internalUpdater) {
       internalUpdater(oldPos, newPos);
     }
   });
+}
+
+function animateSwitchRow(oldPos, newPos) {
+  if (oldPos < newPos) {
+    $('.switchslide').removeClass('switchslide');
+    for(let i = oldPos;i < newPos; i++) {
+      $("[index=" + i + "]").addClass('switchslide');
+    }
+    $('.switchslide').css({'top': $("[index=" + newPos + "]").parent().height(), 'position': 'relative'});
+    $('.switchslide').animate({
+      'top': 0
+    }, {
+      duration: 100, 
+      // avoids (some) flickering
+      step: function(now, fx) {
+        fx.now = parseInt(now);
+      },
+      complete: function() {
+        $(this).css({'top': '', 'position': ''});
+    }});
+  }
+  else {
+    $('.switchslide').removeClass('switchslide');
+    for(let i = oldPos;i > newPos; i--) {
+      $("[index=" + i + "]").addClass('switchslide');
+    }
+    $('.switchslide').css({'bottom': $("[index=" + newPos + "]").parent().height(), 'position': 'relative'});
+    $('.switchslide').animate({
+      'bottom': 0
+    }, {
+      duration: 100, 
+      // avoids (some) flickering
+      step: function(now, fx) {
+        fx.now = parseInt(now);
+      },
+      complete: function() {
+        $(this).css({'bottom': '', 'position': ''});
+    }});
+  }
+}
+
+function animateSwitchCol(oldPos, newPos) {
+  if (oldPos < newPos) {
+    $('.switchslide').removeClass('switchslide');
+    for(let i = oldPos;i < newPos; i++) {
+      $("[index=" + i + "]").addClass('switchslide');
+    }
+    $('.switchslide').css({'left': $("[index=" + newPos + "]").width(), 'position': 'relative'});
+    $('.switchslide').animate({
+      'left': 0
+    }, {
+      duration: 100, 
+      complete: function() {
+        $(this).css({'left': '', 'position': ''});
+    }});
+  }
+  else {
+    $('.switchslide').removeClass('switchslide');
+    for(let i = oldPos;i > newPos; i--) {
+      $("[index=" + i + "]").addClass('switchslide');
+    }
+    $('.switchslide').css({'right': $("[index=" + newPos + "]").width(), 'position': 'relative'});
+    $('.switchslide').animate({
+      'right': 0
+    }, {
+      duration: 100, 
+      complete: function() {
+        $(this).css({'right': '', 'position': ''});
+    }});
+  }
 }
 
 function multByNegOne(element, direction) {
