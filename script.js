@@ -1,5 +1,10 @@
+// list of gaps of the numerical semigroup
+let gapsList = [1, 2, 3, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 22, 23, 25, 28, 31, 34, 37, 43];
+// list of lists of monomials (strings)
 let mat;
+// list of ints
 let gradedDegreesLeft;
+// list of ints
 let gradedDegreesTop;
 let shiftPressed = false;
 let ctrlPressed = false;
@@ -207,9 +212,13 @@ function makeScalable(direction, affectedBettis, internalUpdater) {
       let $draggableElements = $draggable.find("tbody>tr>");
       let $targetElements = $dropContainer.children().find("tbody>tr>");
 
-      // console.log($draggable.find("tbody>tr>"));
-
       let i = 0;
+
+      /*
+      *  TODO:
+      *  now that we have monomials we must convert to their power
+      *  do calculation with powers and then convert back to monomials.
+      */
       while (i < $draggableElements.length) {
         let targetValue = parseInt($targetElements[i].innerHTML);
         let draggedValue = parseInt($draggableElements[i].innerHTML);
@@ -217,6 +226,10 @@ function makeScalable(direction, affectedBettis, internalUpdater) {
         i++;
       }
 
+      /*
+      *  TODO:
+      *  Need to get this internalUpdater Up an Running
+      */
       // internalUpdater(oldPos, newPos);
     }
   });
@@ -350,6 +363,9 @@ function animateSwitchCol(oldPos, newPos) {
   }
 }
 
+/* TODO:
+*  update this so that it can handle the monomials
+*/
 function multByNegOne(element, direction) {
   if (direction == 1) {
     $element = $tableBody.find(element);
@@ -368,6 +384,9 @@ function multByNegOne(element, direction) {
   }
 }
 
+/* TODO:
+*  update this so that it can handle the monomials
+*/
 function updateInternalMatrixNeg(index, direction) {
   if (direction == 'col') {
     for (let row=0; row < mat.length; row++) {
@@ -412,31 +431,15 @@ function updateInteralMatrixByCol(oldPos, newPos) {
 }
 
 function updateInternalMatrixByRowAdder(oldPos, newPos) {
-  temp = gradedDegreesLeft[oldPos];
-  gradedDegreesLeft[oldPos] = gradedDegreesLeft[newPos];
-  gradedDegreesLeft[newPos] = temp;
-
-  for (let col=0; col < mat[0].length; col++){
-    temp = mat[newPos][col];
-    mat[newPos][col] = mat[oldPos][col];
-    mat[oldPos][col] = temp;
-  }
-
-  printMatrix();
+  /*
+  * TODO
+  */
 }
 
 function updateInteralMatrixByColAdder(oldPos, newPos) {
-  temp = gradedDegreesTop[oldPos];
-  gradedDegreesTop[oldPos] = gradedDegreesTop[newPos];
-  gradedDegreesTop[newPos] = temp;
-
-  for (let row=0; row < mat.length; row++){
-    temp = mat[row][newPos];
-    mat[row][newPos] = mat[row][oldPos];
-    mat[row][oldPos] = temp;
-  }
-
-  printMatrix();
+  /*
+  * TODO
+  */
 }
 
 function range(start, stop) {
@@ -446,4 +449,21 @@ function range(start, stop) {
     rangeArray.push(i);
   }
   return rangeArray
+}
+
+function toPower(monomial) {
+  let isNeg = monomial[0] == "-" ? -1 : 1;
+  let exponent = parseInt(monomial.match(/\^(\d+)/)[1]);
+  return isNeg * exponent;
+}
+
+function toMonomial(power) {
+  let isNeg = "";
+
+  if (power < 0) {
+    isNeg = "-";
+    power *= -1;
+  }
+
+  return isNeg + "x^" + power;
 }
