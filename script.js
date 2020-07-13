@@ -210,7 +210,7 @@ function makeScalable(direction, affectedBettis, internalUpdater) {
       oldPos = parseInt($draggableParent.attr('index'));
       newPos = parseInt($dropContainer.attr('index'));
 
-      $draggable.animate({left: '0', top: '0'}, 300);
+      $draggable.animate({left: '0', top: '0'}, 200);
 
       if ($dropContainer.hasClass("in-semi")) {
         $dropContainer.removeClass("in-semi");
