@@ -79,7 +79,7 @@ body {
 }
 
 .draggable {
-  background: #AFA;
+  background: #EEE;
 }
 
 .drop-hover {
@@ -92,4 +92,12 @@ body {
 
 .active {
   background: #AFA;
+}
+
+.in-semi {
+  background: #AFA;
+}
+
+.not-in-semi {
+  background: #FAA;
 }

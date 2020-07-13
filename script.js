@@ -17,6 +17,7 @@ let $innerTable = $(".inner-table");
 
 let oldPos;
 let newPos;
+let scalar;
 
 // once the page loads the table will be made sortable
 // and the matrix will be generated for the matrix in
@@ -56,7 +57,7 @@ function readInput() {
   raw = $("#read-matrix").val();
   rows = raw.split(/\n/);
   rows.forEach(function (row) {
-    finalOutput.push(row.trim().split(/\s/));
+    finalOutput.push(row.trim().split(/\s+/));
   });
   mat = finalOutput;
   gradedDegreesLeft = $("#gradedDegsLeft").val().trim().split(/\s/);
@@ -187,18 +188,20 @@ function makeScalable(direction, affectedBettis, internalUpdater) {
     cursor: 'move',
     revert: 'invalid',
     revertDuration: 300,
-    opacity: 0.6,
+    distance: 5,
+    opacity: 0.8,
     zIndex: 10,
     start: function(event, ui) {
       $(this).addClass("draggable");
+      $(this).parent().droppable("disable");
     },
     stop: function(event, ui) {
       $(this).removeClass("draggable");
+      $(this).parent().droppable("enable");
     }
   });
 
   $("#matrix-body>tr>td").droppable({
-    hoverClass: 'drop-hover',
     drop: function (event, ui) {
       let $draggable = ui.draggable;
       let $draggableParent = $draggable.parent();
@@ -207,30 +210,66 @@ function makeScalable(direction, affectedBettis, internalUpdater) {
       oldPos = parseInt($draggableParent.attr('index'));
       newPos = parseInt($dropContainer.attr('index'));
 
-      $draggable.css({ "left":0, "top":0 });
+      $draggable.animate({left: '0', top: '0'}, 300);
+
+      if ($dropContainer.hasClass("in-semi")) {
+        $dropContainer.removeClass("in-semi");
+      } else {
+        $dropContainer.removeClass("not-in-semi");
+      }
 
       let $draggableElements = $draggable.find("tbody>tr>");
       let $targetElements = $dropContainer.children().find("tbody>tr>");
 
       let i = 0;
 
+
       /*
       *  TODO:
       *  now that we have monomials we must convert to their power
       *  do calculation with powers and then convert back to monomials.
+      *  Use over and out to highlight the color to be red (do not accept)
+      *  and possibly green for the ones you can accept.
+      *  For the ones you cannot accept make droppable for that
+      *  element disabled (on over) once you hover off (on out) return
+      *  the element to its original state.
       */
-      while (i < $draggableElements.length) {
-        let targetValue = parseInt($targetElements[i].innerHTML);
-        let draggedValue = parseInt($draggableElements[i].innerHTML);
-        $targetElements[i].innerHTML = targetValue + draggedValue;
-        i++;
-      }
+      // while (i < $draggableElements.length) {
+      //   let targetValue = parseInt($targetElements[i].innerHTML);
+      //   let draggedValue = parseInt($draggableElements[i].innerHTML);
+      //   $targetElements[i].innerHTML = targetValue + draggedValue;
+      //   i++;
+      // }
 
       /*
       *  TODO:
       *  Need to get this internalUpdater Up an Running
       */
       // internalUpdater(oldPos, newPos);
+    },
+    over: function(event, ui) {
+      $dropContainer = $(this);
+      $draggableParent = ui.draggable.parent();
+      $dropIndex = parseInt($dropContainer.attr("index"));
+      $dragIndex = parseInt($draggableParent.attr("index"));
+      scalar = parseInt(affectedBettis[$dropIndex]) - parseInt(affectedBettis[$dragIndex]);
+      if (gapsList.includes(scalar) || scalar < 0) {
+        $dropContainer.addClass("not-in-semi");
+      } else {
+        $dropContainer.addClass("in-semi");
+      }
+    },
+    out: function(event, ui) {
+      $dropContainer = $(this);
+      $draggableParent = ui.draggable.parent();
+      $dropIndex = parseInt($dropContainer.attr("index"));
+      $dragIndex = parseInt($draggableParent.attr("index"));
+      scalar = parseInt(affectedBettis[$dropIndex]) - parseInt(affectedBettis[$dragIndex]);
+      if (gapsList.includes(scalar) || scalar < 0) {
+        $dropContainer.removeClass("not-in-semi");
+      } else {
+        $dropContainer.removeClass("in-semi");
+      }
     }
   });
 }
@@ -244,6 +283,7 @@ function makeSortable(direction, internalUpdater) {
     revert: 'invalid',
     revertDuration: 300,
     opacity: 0.6,
+    distance: 5,
     zIndex: 10,
     start: function(event, ui) {
       $(this).addClass("draggable");
@@ -303,7 +343,7 @@ function animateSwitchRow(oldPos, newPos) {
     $('.switchslide').animate({
       'top': 0
     }, {
-      duration: 100,
+      duration: 300,
       // avoids (some) flickering
       step: function(now, fx) {
         fx.now = parseInt(now);
@@ -321,7 +361,7 @@ function animateSwitchRow(oldPos, newPos) {
     $('.switchslide').animate({
       'bottom': 0
     }, {
-      duration: 100,
+      duration: 300,
       // avoids (some) flickering
       step: function(now, fx) {
         fx.now = parseInt(now);
@@ -342,7 +382,7 @@ function animateSwitchCol(oldPos, newPos) {
     $('.switchslide').animate({
       'left': 0
     }, {
-      duration: 100,
+      duration: 300,
       complete: function() {
         $(this).css({'left': '', 'position': ''});
     }});
@@ -356,45 +396,47 @@ function animateSwitchCol(oldPos, newPos) {
     $('.switchslide').animate({
       'right': 0
     }, {
-      duration: 100,
+      duration: 300,
       complete: function() {
         $(this).css({'right': '', 'position': ''});
     }});
   }
 }
 
-/* TODO:
-*  update this so that it can handle the monomials
-*/
 function multByNegOne(element, direction) {
   if (direction == 1) {
     $element = $tableBody.find(element);
     index = $tableBody.find(">tr>td").index($element);
     $element.find(">table>tbody>tr>td").each(function() {
-      this.innerHTML *= -1;
+      if (this.innerHTML != "0") {
+        this.innerHTML = toMonomial(toPower(this.innerHTML) * -1);
+      }
     });
     updateInternalMatrixNeg(index, 'col');
   } else if (direction == 0) {
     $element = $tableBody.find(element);
     index = $tableBody.find(".movers").index($element);
     $element.find('>td>table>tbody>tr>td').each(function() {
-      this.innerHTML *= -1;
+      if (this.innerHTML != "0") {
+        this.innerHTML = toMonomial(toPower(this.innerHTML) * -1);
+      }
     });
     updateInternalMatrixNeg(index, 'row');
   }
 }
 
-/* TODO:
-*  update this so that it can handle the monomials
-*/
 function updateInternalMatrixNeg(index, direction) {
   if (direction == 'col') {
     for (let row=0; row < mat.length; row++) {
-      mat[row][index] *= -1;
+      if (mat[row][index] != "0") {
+        mat[row][index] = toMonomial(toPower(mat[row][index]) * -1);
+      }
     }
   } else if (direction == 'row') {
     for (let col=0; col < mat[0].length; col++) {
-      mat[index][col] *= -1;
+      if (mat[index][col] != "0") {
+        mat[index][col] = toMonomial(toPower(mat[index][col]) * -1);
+      }
     }
   }
   printMatrix();
