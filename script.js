@@ -214,38 +214,30 @@ function makeScalable(direction, affectedBettis, internalUpdater) {
 
       if ($dropContainer.hasClass("in-semi")) {
         $dropContainer.removeClass("in-semi");
+        let $draggableElements = $draggable.find("tbody>tr>td");
+        let $targetElements = $dropContainer.children().find("tbody>tr>td");
+        let $dropIndex = parseInt($dropContainer.attr("index"));
+        let $dragIndex = parseInt($draggableParent.attr("index"));
+        scalar = parseInt(affectedBettis[$dropIndex]) - parseInt(affectedBettis[$dragIndex]);
+
+        let i = 0;
+        while (i < $draggableElements.length) {
+          let targetValue = toPower($targetElements[i].innerHTML);
+          let draggedValue = toPower($draggableElements[i].innerHTML);
+          let isNeg = draggedValue.toString()[0] == "-" ? -1 : 1;
+          let scaledValue = draggedValue == 0 ? 0 : (draggedValue + (isNeg * scalar));
+          $targetElements[i].innerHTML = toMonomial(targetValue + scaledValue);
+          i++;
+        }
+        /*
+        *  TODO:
+        *  Need to get this internalUpdater Up an Running
+        */
+        // internalUpdater(oldPos, newPos);
       } else {
         $dropContainer.removeClass("not-in-semi");
       }
 
-      let $draggableElements = $draggable.find("tbody>tr>");
-      let $targetElements = $dropContainer.children().find("tbody>tr>");
-
-      let i = 0;
-
-
-      /*
-      *  TODO:
-      *  now that we have monomials we must convert to their power
-      *  do calculation with powers and then convert back to monomials.
-      *  Use over and out to highlight the color to be red (do not accept)
-      *  and possibly green for the ones you can accept.
-      *  For the ones you cannot accept make droppable for that
-      *  element disabled (on over) once you hover off (on out) return
-      *  the element to its original state.
-      */
-      // while (i < $draggableElements.length) {
-      //   let targetValue = parseInt($targetElements[i].innerHTML);
-      //   let draggedValue = parseInt($draggableElements[i].innerHTML);
-      //   $targetElements[i].innerHTML = targetValue + draggedValue;
-      //   i++;
-      // }
-
-      /*
-      *  TODO:
-      *  Need to get this internalUpdater Up an Running
-      */
-      // internalUpdater(oldPos, newPos);
     },
     over: function(event, ui) {
       $dropContainer = $(this);
@@ -494,12 +486,18 @@ function range(start, stop) {
 }
 
 function toPower(monomial) {
+  if (monomial == "0") {
+    return 0;
+  }
   let isNeg = monomial[0] == "-" ? -1 : 1;
   let exponent = parseInt(monomial.match(/\^(\d+)/)[1]);
   return isNeg * exponent;
 }
 
 function toMonomial(power) {
+  if (power == 0) {
+    return "0";
+  }
   let isNeg = "";
 
   if (power < 0) {
