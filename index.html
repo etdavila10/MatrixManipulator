@@ -45,9 +45,10 @@ x^6 x^9 0 x^20 0 0 0
         </table>
       </div>
         <div id="options">
-          <button id="add" onclick="">Add Rows/Cols</button>
-          <button id="permute" onclick="" class="active">Permute Rows/Cols</button>
-          <button id="toggle" onclick="toggleRowsColumns()">Toggle Rows/Cols</button>
+          <button id="add-permute" onclick="toggleAddSort()">Currently Permuting</button>
+          <button id="row-col" onclick="toggleRowsColumns()">Toggle Rows/Cols</button>
+          <button id="reset" onclick="resetMatrix()">Reset</button>
+          <button id="update" onclick="updateMatrix()">Update Changes</button>
           <button id="clean" onclick="cleanUp()">Clear</button>
         </div>
     </div>

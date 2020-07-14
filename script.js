@@ -1,11 +1,19 @@
 // list of gaps of the numerical semigroup
 let gapsList = [1, 2, 3, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 22, 23, 25, 28, 31, 34, 37, 43];
 // list of lists of monomials (strings)
-let mat;
+let mat = [];
+
+// Make copy of matrix
+let matCopy = [];
+
 // list of ints
 let gradedDegreesLeft;
+// copy of left bettis
+let leftBettisCopy;
 // list of ints
 let gradedDegreesTop;
+// copy of top bettis
+let topBettisCopy;
 let shiftPressed = false;
 let ctrlPressed = false;
 
@@ -23,30 +31,12 @@ let scalar;
 // and the matrix will be generated for the matrix in
 // the textarea
 $(document).ready(function() {
-  readInput();
-  createTable();
+  readAndGenerateMatrix();
   $(document).keydown(function(event) {
-    if (event.keyCode == 16 && !shiftPressed) {
-      shiftPressed = true;
-      switchToRows();
-      createTable();
-    }
-    else if (event.keyCode == 16 && shiftPressed) {
-      shiftPressed = false;
-      switchToCols();
-      createTable();
-    }
-    if (event.keyCode == 17 && !ctrlPressed) {
-      ctrlPressed = true;
-      $("#permute").removeClass("active");
-      $("#add").addClass("active");
-      createTable();
-    }
-    else if (event.keyCode == 17 && ctrlPressed) {
-      ctrlPressed = false;
-      $("#add").removeClass("active");
-      $("#permute").addClass("active");
-      createTable();
+    if (event.keyCode == 16) {
+      toggleRowsColumns();
+    } else if (event.keyCode == 17) {
+      toggleAddSort();
     }
   });
 });
@@ -66,6 +56,12 @@ function readInput() {
 
 function readAndGenerateMatrix() {
   readInput();
+  matCopy = [];
+  mat.forEach(function(row) {
+    matCopy.push([...row]);
+  });
+  leftBettisCopy = [...gradedDegreesLeft];
+  topBettisCopy = [...gradedDegreesTop];
   createTable();
 }
 
@@ -91,15 +87,15 @@ function createTable() {
   if (!shiftPressed) {
     let tableRow = '<tr>';
     tableRow += '<th id="border-maker" class="by-cols"><table class="inner-table"><tr id="inner-border-maker" class="inner-border-col"><th>GrDgs</th></tr>';
-    for (let i=0; i < gradedDegreesLeft.length; i++) {
-      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + gradedDegreesLeft[i] + '</th></tr>';
+    for (let i=0; i < leftBettisCopy.length; i++) {
+      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + leftBettisCopy[i] + '</th></tr>';
     }
     tableRow += '</table></th>';
-    for (let col=0; col < mat[0].length; col++) {
+    for (let col=0; col < matCopy[0].length; col++) {
       tableRow += '<td index='+ col +' id="border-maker" class="by-cols" onclick="multByNegOne(this, 1)"><table class="inner-table">';
-      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + gradedDegreesTop[col] + '</th></tr>';
-      for (let row=0; row < mat.length; row++) {
-        tableRow += '<tr id="inner-border-maker" class="inner-border-col"><td>' + mat[row][col] + '</td></tr>';
+      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + topBettisCopy[col] + '</th></tr>';
+      for (let row=0; row < matCopy.length; row++) {
+        tableRow += '<tr id="inner-border-maker" class="inner-border-col"><td>' + matCopy[row][col] + '</td></tr>';
       }
       tableRow += '</table></td>';
     }
@@ -107,25 +103,24 @@ function createTable() {
     $tableBody.append(tableRow);
     if (!ctrlPressed) {
       makeSortable('x', function(oldPos, newPos) {
-        updateInteralMatrixByCol(oldPos, newPos);
-        animateSwitchCol(oldPos, newPos);
+        updateInteralMatrixByCol(oldPos, newPos); animateSwitchCol(oldPos, newPos);
       });
     } else {
-      makeScalable('x', gradedDegreesTop, updateInteralMatrixByColAdder);
+      makeScalable('x', topBettisCopy, updateInteralMatrixByColAdder);
     }
   // By Rows
   } else {
     let tableRow;
     tableRow += '<tr id="border-maker" class="by-rows"><th><table class="inner-table"><tr><th id="inner-border-maker" class="inner-border-row">GrDgs</th>';
-    for (let i=0; i < gradedDegreesTop.length; i++) {
-      tableRow += '<th id="inner-border-maker" class="inner-border-row">' + gradedDegreesTop[i] + '</th>';
+    for (let i=0; i < topBettisCopy.length; i++) {
+      tableRow += '<th id="inner-border-maker" class="inner-border-row">' + topBettisCopy[i] + '</th>';
     }
     tableRow += '</tr></table></th></tr>'
-    for (let row=0; row < mat.length; row++) {
+    for (let row=0; row < matCopy.length; row++) {
       tableRow += '<tr id="border-maker" class="by-rows movers" onclick="multByNegOne(this, 0)"><td index=' + row + '><table class="inner-table"><tr>';
-      tableRow += '<th id="inner-border-maker" class="inner-border-row">' + gradedDegreesLeft[row] + '</th>';
-      for (let col=0; col < mat[0].length; col++) {
-        tableRow += '<td id="inner-border-maker" class="inner-border-row">' + mat[row][col] + '</td>';
+      tableRow += '<th id="inner-border-maker" class="inner-border-row">' + leftBettisCopy[row] + '</th>';
+      for (let col=0; col < matCopy[0].length; col++) {
+        tableRow += '<td id="inner-border-maker" class="inner-border-row">' + matCopy[row][col] + '</td>';
       }
       tableRow += '</tr></table></td></tr>';
     }
@@ -136,7 +131,7 @@ function createTable() {
         animateSwitchRow(oldPos, newPos);
       });
     } else {
-      makeScalable('y', gradedDegreesLeft, updateInternalMatrixByRowAdder);
+      makeScalable('y', leftBettisCopy, updateInternalMatrixByRowAdder);
     }
   }
 }
@@ -172,6 +167,19 @@ function toggleRowsColumns() {
   else if (shiftPressed) {
     shiftPressed = false;
     switchToCols();
+    createTable();
+  }
+}
+
+function toggleAddSort() {
+  if (!ctrlPressed) {
+    ctrlPressed = true;
+    $("#add-permute").html("Currently Adding");
+    createTable();
+  }
+  else if (ctrlPressed) {
+    ctrlPressed = false;
+    $("#add-permute").html("Currently Permuting");
     createTable();
   }
 }
@@ -229,11 +237,7 @@ function makeScalable(direction, affectedBettis, internalUpdater) {
           $targetElements[i].innerHTML = toMonomial(targetValue + scaledValue);
           i++;
         }
-        /*
-        *  TODO:
-        *  Need to get this internalUpdater Up an Running
-        */
-        // internalUpdater(oldPos, newPos);
+        internalUpdater(oldPos, newPos);
       } else {
         $dropContainer.removeClass("not-in-semi");
       }
@@ -419,61 +423,105 @@ function multByNegOne(element, direction) {
 
 function updateInternalMatrixNeg(index, direction) {
   if (direction == 'col') {
-    for (let row=0; row < mat.length; row++) {
-      if (mat[row][index] != "0") {
-        mat[row][index] = toMonomial(toPower(mat[row][index]) * -1);
+    for (let row=0; row < matCopy.length; row++) {
+      if (matCopy[row][index] != "0") {
+        matCopy[row][index] = toMonomial(toPower(matCopy[row][index]) * -1);
       }
     }
   } else if (direction == 'row') {
-    for (let col=0; col < mat[0].length; col++) {
-      if (mat[index][col] != "0") {
-        mat[index][col] = toMonomial(toPower(mat[index][col]) * -1);
+    for (let col=0; col < matCopy[0].length; col++) {
+      if (matCopy[index][col] != "0") {
+        matCopy[index][col] = toMonomial(toPower(matCopy[index][col]) * -1);
       }
     }
   }
-  printMatrix();
+  // printMatrix();
 }
 
 // Update the Interal Matrix as you make changes
 // to the one on the table
 function updateInteralMatrixByRow(oldPos, newPos) {
-  temp = gradedDegreesLeft[oldPos];
-  gradedDegreesLeft.splice(oldPos, 1);
-  gradedDegreesLeft.splice(newPos, 0, temp);
+  temp = leftBettisCopy[oldPos];
+  leftBettisCopy.splice(oldPos, 1);
+  leftBettisCopy.splice(newPos, 0, temp);
 
-  temp = mat[oldPos];
-  mat.splice(oldPos, 1);
-  mat.splice(newPos, 0, temp);
+  temp = matCopy[oldPos];
+  matCopy.splice(oldPos, 1);
+  matCopy.splice(newPos, 0, temp);
 
-  printMatrix();
+  // printMatrix();
 }
 
 // Update the Interal Matrix as you make changes
 // to the one on the table
 function updateInteralMatrixByCol(oldPos, newPos) {
-  temp = gradedDegreesTop[oldPos];
-  gradedDegreesTop.splice(oldPos, 1);
-  gradedDegreesTop.splice(newPos, 0, temp);
+  temp = topBettisCopy[oldPos];
+  topBettisCopy.splice(oldPos, 1);
+  topBettisCopy.splice(newPos, 0, temp);
 
-  for (let row=0; row < mat.length; row++){
-    temp = mat[row][oldPos];
-    mat[row].splice(oldPos, 1);
-    mat[row].splice(newPos, 0, temp);
+  for (let row=0; row < matCopy.length; row++){
+    temp = matCopy[row][oldPos];
+    matCopy[row].splice(oldPos, 1);
+    matCopy[row].splice(newPos, 0, temp);
   }
 
-  printMatrix();
+  // printMatrix();
 }
 
 function updateInternalMatrixByRowAdder(oldPos, newPos) {
-  /*
-  * TODO
-  */
+  let draggedRow = matCopy[oldPos];
+  let targetRow = matCopy[newPos];
+  let draggedBetti = parseInt(leftBettisCopy[oldPos]);
+  let targetBetti = parseInt(leftBettisCopy[newPos]);
+
+  scalar = targetBetti - draggedBetti;
+
+  let i = 0;
+  while (i < targetRow.length) {
+    let targetValue = toPower(targetRow[i]);
+    let draggedValue = toPower(draggedRow[i]);
+    let isNeg = draggedValue.toString()[0] == "-" ? -1 : 1;
+    let scaledValue = draggedValue == 0 ? 0 : (draggedValue + (isNeg * scalar));
+    targetRow[i] = toMonomial(targetValue + scaledValue);
+    i++;
+  }
+  // printMatrix();
 }
 
 function updateInteralMatrixByColAdder(oldPos, newPos) {
-  /*
-  * TODO
-  */
+  let draggedBetti = parseInt(topBettisCopy[oldPos]);
+  let targetBetti = parseInt(topBettisCopy[newPos]);
+
+  scalar = targetBetti - draggedBetti;
+
+  for (let row = 0; row < matCopy.length; row++) {
+    let targetValue = toPower(matCopy[row][newPos]);
+    let draggedValue = toPower(matCopy[row][oldPos]);
+    let isNeg = draggedValue.toString()[0] == "-" ? -1 : 1;
+    let scaledValue = draggedValue == 0 ? 0 : (draggedValue + (isNeg * scalar));
+    matCopy[row][newPos] = toMonomial(targetValue + scaledValue);
+  }
+  // printMatrix();
+}
+
+function resetMatrix() {
+  matCopy = [];
+  mat.forEach(function(row) {
+    matCopy.push([...row]);
+  });
+  topBettisCopy = [...gradedDegreesTop];
+  leftBettisCopy = [...gradedDegreesLeft];
+  createTable();
+}
+
+function updateMatrix() {
+  mat = [];
+  matCopy.forEach(function(row) {
+    mat.push([...row]);
+  });
+  gradedDegreesTop = [...topBettisCopy];
+  gradedDegreesLeft = [...leftBettisCopy];
+  printMatrix();
 }
 
 function range(start, stop) {
