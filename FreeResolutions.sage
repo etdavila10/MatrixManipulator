@@ -191,7 +191,7 @@ class FreeResolution:
         return entire_dict
 
     def manipulator_file(self, filename = None):
-        if filename is None:
+        if filename is not None and fliename == "":
             filename = 'matrixmanipulator-' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S') + '.txt'
         
         lines = []
@@ -228,8 +228,11 @@ class FreeResolution:
             
             lines.append('')
         
-        with open(filename, "w") as f:
-            f.write("\n".join(lines))
+        if filename is None:
+            print("\n".join(lines))
+        else:
+            with open(filename, "w") as f:
+                f.write("\n".join(lines))
 
     def print_resolution(self):
         spacing_res = 6
