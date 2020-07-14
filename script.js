@@ -80,6 +80,7 @@ function updatedReadInput() {
 
   curLine = 1;
   allGradedDegrees = [];
+  matrices = []
 
   while (curLine < formattedLines.length) {
     // currently at dimensions
