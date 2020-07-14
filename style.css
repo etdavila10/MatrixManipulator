@@ -38,6 +38,7 @@ body {
   border-collapse: collapse;
   text-align: center;
   margin: 10px auto;
+  table-layout: fixed;
 }
 
 #matrix-body tr th,
@@ -61,11 +62,12 @@ body {
 
 .inner-table {
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .inner-table tr th,
 .inner-table tr td {
-  width: 50px;
+  width: 100px !important;
   padding: 10px !important;
   margin: 0;
 }

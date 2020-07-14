@@ -190,14 +190,14 @@ function createTable() {
     let tableRow = '<tr>';
     tableRow += '<th id="border-maker" class="by-cols"><table class="inner-table"><tr id="inner-border-maker" class="inner-border-col"><th>GrDgs</th></tr>';
     for (let i=0; i < leftBettisCopy.length; i++) {
-      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + leftBettisCopy[i] + '</th></tr>';
+      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th><nobr>' + leftBettisCopy[i] + '</nobr></th></tr>';
     }
     tableRow += '</table></th>';
     for (let col=0; col < matCopy[0].length; col++) {
       tableRow += '<td index='+ col +' id="border-maker" class="by-cols" onclick="multByNegOne(this, 1)"><table class="inner-table">';
-      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + topBettisCopy[col] + '</th></tr>';
+      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th><nobr>' + topBettisCopy[col] + '</nobr></th></tr>';
       for (let row=0; row < matCopy.length; row++) {
-        tableRow += '<tr id="inner-border-maker" class="inner-border-col"><td>' + matCopy[row][col] + '</td></tr>';
+        tableRow += '<tr id="inner-border-maker" class="inner-border-col"><td><nobr>' + matCopy[row][col] + '</nobr></td></tr>';
       }
       tableRow += '</table></td>';
     }
@@ -215,14 +215,14 @@ function createTable() {
     let tableRow;
     tableRow += '<tr id="border-maker" class="by-rows"><th><table class="inner-table"><tr><th id="inner-border-maker" class="inner-border-row">GrDgs</th>';
     for (let i=0; i < topBettisCopy.length; i++) {
-      tableRow += '<th id="inner-border-maker" class="inner-border-row">' + topBettisCopy[i] + '</th>';
+      tableRow += '<th id="inner-border-maker" class="inner-border-row"><nobr>' + topBettisCopy[i] + '</nobr></th>';
     }
     tableRow += '</tr></table></th></tr>'
     for (let row=0; row < matCopy.length; row++) {
       tableRow += '<tr id="border-maker" class="by-rows movers" onclick="multByNegOne(this, 0)"><td index=' + row + '><table class="inner-table"><tr>';
-      tableRow += '<th id="inner-border-maker" class="inner-border-row">' + leftBettisCopy[row] + '</th>';
+      tableRow += '<th id="inner-border-maker" class="inner-border-row"><nobr>' + leftBettisCopy[row] + '</nobr></th>';
       for (let col=0; col < matCopy[0].length; col++) {
-        tableRow += '<td id="inner-border-maker" class="inner-border-row">' + matCopy[row][col] + '</td>';
+        tableRow += '<td id="inner-border-maker" class="inner-border-row"><nobr>' + matCopy[row][col] + '</nobr></td>';
       }
       tableRow += '</tr></table></td></tr>';
     }
