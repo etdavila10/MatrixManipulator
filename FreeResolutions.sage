@@ -1,5 +1,6 @@
 import re
 from collections import Counter
+import datetime
 
 class FreeResolution:
     def __init__(self, gens, length_limit=5):
@@ -188,6 +189,47 @@ class FreeResolution:
         for i in range(1, self.length_limit - 1):
             entire_dict.setdefault(i, dict(Counter(self.graded_degrees[i].column(0))))
         return entire_dict
+
+    def manipulator_file(self, filename = None):
+        if filename is None:
+            filename = 'matrixmanipulator-' + datetime.datetime.now().strftime('%Y%m%d-%H%M%S') + '.txt'
+        
+        lines = []
+        
+        print(self.graded_degrees)
+        print(self.matrices)
+        
+        S = NumericalSemigroup(self.gens)
+        gaplist = [i for i in [1 .. S.FrobeniusNumber()] if i not in S]
+        lines.append(' '.join([str(i) for i in gaplist]))
+        lines.append('')
+        
+        for i in range(1,len(self.matrices)):
+            M = self.matrices[i]
+            G = self.graded_degrees[i-1]
+            G2 = self.graded_degrees[i]
+            
+            lines.append(str(M.nrows()) + ' ' + str(M.ncols()))
+            
+            if G.nrows() == 0:
+                lines.append('0')
+            else:
+                lines.append(' '.join([str(d[0]) for d in G.rows()]))
+
+            if G2.nrows() == 0:
+                lines.append('0')
+            else:
+                lines.append(' '.join([str(d[0]) for d in G2.rows()]))
+            
+            lines.append('')
+            
+            for row in M.rows():
+                lines.append(' '.join([str(entry) for entry in row]))
+            
+            lines.append('')
+        
+        with open(filename, "w") as f:
+            f.write("\n".join(lines))
 
     def print_resolution(self):
         spacing_res = 6
