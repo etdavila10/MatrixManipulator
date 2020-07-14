@@ -196,9 +196,6 @@ class FreeResolution:
         
         lines = []
         
-        print(self.graded_degrees)
-        print(self.matrices)
-        
         S = NumericalSemigroup(self.gens)
         gaplist = [i for i in [1 .. S.FrobeniusNumber()] if i not in S]
         lines.append(' '.join([str(i) for i in gaplist]))
