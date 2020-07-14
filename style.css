@@ -1,12 +1,14 @@
 body {
-  matrix: 0;
+  margin: 0;
   padding: 0;
+  background: #f6ab6c;
+  font-family: 'Roboto', sans-serif;
 }
 
 .container {
   width: 960px;
   overflow: auto;
-  border: 2px solid blue;
+  background: white;
   margin: 0 auto;
   text-align: center;
 }
@@ -14,7 +16,7 @@ body {
 #matrix-input {
   width: 900px;
   max-height: 500px;
-  margin: 10px auto;
+  margin: 50px auto;
 }
 
 #read-matrix {
@@ -23,7 +25,7 @@ body {
 
 #matrix-output {
   width: 900px;
-  margin: 10px auto;
+  margin: 50px auto;
 }
 
 #matrix-container {
