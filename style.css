@@ -67,6 +67,7 @@ body {
 
 .inner-table tr th,
 .inner-table tr td {
+  white-space: nowrap;
   width: 100px !important;
   padding: 10px !important;
   margin: 0;
