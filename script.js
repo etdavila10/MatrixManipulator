@@ -44,9 +44,7 @@ $(document).ready(function() {
   generateMatrix();
   // readAndGenerateMatrix();
   $(document).keydown(function(event) {
-    if (event.keyCode == 16) {
-      toggleRowsColumns();
-    } else if (event.keyCode == 17) {
+    if (event.keyCode == 17) {
       toggleAddSort();
     }
   });
@@ -186,92 +184,92 @@ function printMatrix() {
 function createTable() {
   $tableBody.empty();
   // By Columns
-  if (!shiftPressed) {
-    let tableRow = '<tr>';
-    tableRow += '<th id="border-maker" class="by-cols"><table class="inner-table"><tr id="inner-border-maker" class="inner-border-col"><th>GrDgs</th></tr>';
-    for (let i=0; i < leftBettisCopy.length; i++) {
-      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + leftBettisCopy[i] + '</th></tr>';
-    }
-    tableRow += '</table></th>';
-    for (let col=0; col < matCopy[0].length; col++) {
-      tableRow += '<td index='+ col +' id="border-maker" class="by-cols" onclick="multByNegOne(this, 1)"><table class="inner-table">';
-      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + topBettisCopy[col] + '</th></tr>';
-      for (let row=0; row < matCopy.length; row++) {
-        tableRow += '<tr id="inner-border-maker" class="inner-border-col"><td>' + matCopy[row][col] + '</td></tr>';
-      }
-      tableRow += '</table></td>';
-    }
-    tableRow += '</tr>';
-    $tableBody.append(tableRow);
-    if (!ctrlPressed) {
-      makeSortable('x', function(oldPos, newPos) {
-        updateInteralMatrixByCol(oldPos, newPos); animateSwitchCol(oldPos, newPos);
-      });
-    } else {
-      makeScalable('x', topBettisCopy, updateInteralMatrixByColAdder);
-    }
-  // By Rows
-  } else {
-    let tableRow;
-    tableRow += '<tr id="border-maker" class="by-rows"><th><table class="inner-table"><tr><th id="inner-border-maker" class="inner-border-row">GrDgs</th>';
-    for (let i=0; i < topBettisCopy.length; i++) {
-      tableRow += '<th id="inner-border-maker" class="inner-border-row">' + topBettisCopy[i] + '</th>';
-    }
-    tableRow += '</tr></table></th></tr>'
+  // if (!shiftPressed) {
+  let tableRow = '<tr>';
+  tableRow += '<th id="border-maker" class="by-cols"><table class="inner-table"><tr id="inner-border-maker" class="inner-border-col"><th>GrDgs</th></tr>';
+  for (let i=0; i < leftBettisCopy.length; i++) {
+    tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + leftBettisCopy[i] + '</th></tr>';
+  }
+  tableRow += '</table></th>';
+  for (let col=0; col < matCopy[0].length; col++) {
+    tableRow += '<td index='+ col +' id="border-maker" class="by-cols" onclick="multByNegOne(this)"><table class="inner-table">';
+    tableRow += '<tr id="inner-border-maker" class="inner-border-col"><th>' + topBettisCopy[col] + '</th></tr>';
     for (let row=0; row < matCopy.length; row++) {
-      tableRow += '<tr id="border-maker" class="by-rows movers" onclick="multByNegOne(this, 0)"><td index=' + row + '><table class="inner-table"><tr>';
-      tableRow += '<th id="inner-border-maker" class="inner-border-row">' + leftBettisCopy[row] + '</th>';
-      for (let col=0; col < matCopy[0].length; col++) {
-        tableRow += '<td id="inner-border-maker" class="inner-border-row">' + matCopy[row][col] + '</td>';
-      }
-      tableRow += '</tr></table></td></tr>';
+      tableRow += '<tr id="inner-border-maker" class="inner-border-col"><td>' + matCopy[row][col] + '</td></tr>';
     }
-    $tableBody.append(tableRow);
-    if (!ctrlPressed) {
-      makeSortable('y', function(oldPos, newPos) {
-        updateInteralMatrixByRow(oldPos, newPos);
-        animateSwitchRow(oldPos, newPos);
-      });
-    } else {
-      makeScalable('y', leftBettisCopy, updateInternalMatrixByRowAdder);
-    }
+    tableRow += '</table></td>';
   }
+  tableRow += '</tr>';
+  $tableBody.append(tableRow);
+  if (!ctrlPressed) {
+    makeSortable('x', function(oldPos, newPos) {
+      updateInteralMatrixByCol(oldPos, newPos); animateSwitchCol(oldPos, newPos);
+    });
+  } else {
+    makeScalable('x', topBettisCopy, updateInteralMatrixByColAdder);
+  }
+  // By Rows
+  // } else {
+  //   let tableRow;
+  //   tableRow += '<tr id="border-maker" class="by-rows"><th><table class="inner-table"><tr><th id="inner-border-maker" class="inner-border-row">GrDgs</th>';
+  //   for (let i=0; i < topBettisCopy.length; i++) {
+  //     tableRow += '<th id="inner-border-maker" class="inner-border-row">' + topBettisCopy[i] + '</th>';
+  //   }
+  //   tableRow += '</tr></table></th></tr>'
+  //   for (let row=0; row < matCopy.length; row++) {
+  //     tableRow += '<tr id="border-maker" class="by-rows movers" onclick="multByNegOne(this, 0)"><td index=' + row + '><table class="inner-table"><tr>';
+  //     tableRow += '<th id="inner-border-maker" class="inner-border-row">' + leftBettisCopy[row] + '</th>';
+  //     for (let col=0; col < matCopy[0].length; col++) {
+  //       tableRow += '<td id="inner-border-maker" class="inner-border-row">' + matCopy[row][col] + '</td>';
+  //     }
+  //     tableRow += '</tr></table></td></tr>';
+  //   }
+  //   $tableBody.append(tableRow);
+  //   if (!ctrlPressed) {
+  //     makeSortable('y', function(oldPos, newPos) {
+  //       updateInteralMatrixByRow(oldPos, newPos);
+  //       animateSwitchRow(oldPos, newPos);
+  //     });
+  //   } else {
+  //     makeScalable('y', leftBettisCopy, updateInternalMatrixByRowAdder);
+  //   }
+  // }
 }
 
-function switchToRows() {
-  $tableBody.find('#border-maker').each(function () {
-    $(this).removeClass("by-cols");
-    $(this).addClass("by-rows");
-  });
-  $innerTable.find('#inner-border-maker').each(function() {
-    $(this).addClass("inner-border-row");
-    $(this).removeClass("inner-border-col");
-  });
-}
+// function switchToRows() {
+//   $tableBody.find('#border-maker').each(function () {
+//     $(this).removeClass("by-cols");
+//     $(this).addClass("by-rows");
+//   });
+//   $innerTable.find('#inner-border-maker').each(function() {
+//     $(this).addClass("inner-border-row");
+//     $(this).removeClass("inner-border-col");
+//   });
+// }
 
-function switchToCols() {
-  $tableBody.find('#border-maker').each(function () {
-    $(this).removeClass("by-rows");
-    $(this).addClass("by-cols");
-  });
-  $innerTable.find('#inner-border-maker').each(function() {
-    $(this).removeClass("inner-border-row");
-    $(this).addClass("inner-border-col");
-  });
-}
+// function switchToCols() {
+//   $tableBody.find('#border-maker').each(function () {
+//     $(this).removeClass("by-rows");
+//     $(this).addClass("by-cols");
+//   });
+//   $innerTable.find('#inner-border-maker').each(function() {
+//     $(this).removeClass("inner-border-row");
+//     $(this).addClass("inner-border-col");
+//   });
+// }
 
-function toggleRowsColumns() {
-  if (!shiftPressed) {
-    shiftPressed = true;
-    switchToRows();
-    createTable();
-  }
-  else if (shiftPressed) {
-    shiftPressed = false;
-    switchToCols();
-    createTable();
-  }
-}
+// function toggleRowsColumns() {
+//   if (!shiftPressed) {
+//     shiftPressed = true;
+//     switchToRows();
+//     createTable();
+//   }
+//   else if (shiftPressed) {
+//     shiftPressed = false;
+//     switchToCols();
+//     createTable();
+//   }
+// }
 
 function toggleAddSort() {
   if (!ctrlPressed) {
@@ -431,44 +429,44 @@ function makeSortable(direction, internalUpdater) {
   });
 }
 
-function animateSwitchRow(oldPos, newPos) {
-  if (oldPos < newPos) {
-    $('.switchslide').removeClass('switchslide');
-    for(let i = oldPos;i < newPos; i++) {
-      $("[index=" + i + "]").addClass('switchslide');
-    }
-    $('.switchslide').css({'top': $("[index=" + newPos + "]").parent().height(), 'position': 'relative'});
-    $('.switchslide').animate({
-      'top': 0
-    }, {
-      duration: 300,
-      // avoids (some) flickering
-      step: function(now, fx) {
-        fx.now = parseInt(now);
-      },
-      complete: function() {
-        $(this).css({'top': '', 'position': ''});
-    }});
-  }
-  else {
-    $('.switchslide').removeClass('switchslide');
-    for(let i = oldPos;i > newPos; i--) {
-      $("[index=" + i + "]").addClass('switchslide');
-    }
-    $('.switchslide').css({'bottom': $("[index=" + newPos + "]").parent().height(), 'position': 'relative'});
-    $('.switchslide').animate({
-      'bottom': 0
-    }, {
-      duration: 300,
-      // avoids (some) flickering
-      step: function(now, fx) {
-        fx.now = parseInt(now);
-      },
-      complete: function() {
-        $(this).css({'bottom': '', 'position': ''});
-    }});
-  }
-}
+// function animateSwitchRow(oldPos, newPos) {
+//   if (oldPos < newPos) {
+//     $('.switchslide').removeClass('switchslide');
+//     for(let i = oldPos;i < newPos; i++) {
+//       $("[index=" + i + "]").addClass('switchslide');
+//     }
+//     $('.switchslide').css({'top': $("[index=" + newPos + "]").parent().height(), 'position': 'relative'});
+//     $('.switchslide').animate({
+//       'top': 0
+//     }, {
+//       duration: 300,
+//       // avoids (some) flickering
+//       step: function(now, fx) {
+//         fx.now = parseInt(now);
+//       },
+//       complete: function() {
+//         $(this).css({'top': '', 'position': ''});
+//     }});
+//   }
+//   else {
+//     $('.switchslide').removeClass('switchslide');
+//     for(let i = oldPos;i > newPos; i--) {
+//       $("[index=" + i + "]").addClass('switchslide');
+//     }
+//     $('.switchslide').css({'bottom': $("[index=" + newPos + "]").parent().height(), 'position': 'relative'});
+//     $('.switchslide').animate({
+//       'bottom': 0
+//     }, {
+//       duration: 300,
+//       // avoids (some) flickering
+//       step: function(now, fx) {
+//         fx.now = parseInt(now);
+//       },
+//       complete: function() {
+//         $(this).css({'bottom': '', 'position': ''});
+//     }});
+//   }
+// }
 
 function animateSwitchCol(oldPos, newPos) {
   if (oldPos < newPos) {
@@ -501,81 +499,81 @@ function animateSwitchCol(oldPos, newPos) {
   }
 }
 
-function multByNegOne(element, direction) {
-  if (direction == 1) {
-    $element = $tableBody.find(element);
-    index = $tableBody.find(">tr>td").index($element);
-    $element.find(">table>tbody>tr>td").each(function() {
-      if (this.innerHTML != "0") {
-        this.innerHTML = toMonomial(toPower(this.innerHTML) * -1);
-      }
-    });
-    updateInternalMatrixNeg(index, 'col');
-  } else if (direction == 0) {
-    $element = $tableBody.find(element);
-    index = $tableBody.find(".movers").index($element);
-    $element.find('>td>table>tbody>tr>td').each(function() {
-      if (this.innerHTML != "0") {
-        this.innerHTML = toMonomial(toPower(this.innerHTML) * -1);
-      }
-    });
-    updateInternalMatrixNeg(index, 'row');
-  }
+function multByNegOne(element) {
+  // if (direction == 1) {
+  $element = $tableBody.find(element);
+  index = $tableBody.find(">tr>td").index($element);
+  $element.find(">table>tbody>tr>td").each(function() {
+    if (this.innerHTML != "0") {
+      this.innerHTML = toMonomial(toPower(this.innerHTML) * -1);
+    }
+  });
+  updateInternalMatrixNeg(index);
+  // } else if (direction == 0) {
+  //   $element = $tableBody.find(element);
+  //   index = $tableBody.find(".movers").index($element);
+  //   $element.find('>td>table>tbody>tr>td').each(function() {
+  //     if (this.innerHTML != "0") {
+  //       this.innerHTML = toMonomial(toPower(this.innerHTML) * -1);
+  //     }
+  //   });
+  //   updateInternalMatrixNeg(index, 'row');
+  // }
 }
 
-function updateInternalMatrixNeg(index, direction) {
-  if (direction == 'col') {
-    for (let row=0; row < matCopy.length; row++) {
-      if (matCopy[row][index] != "0") {
-        matCopy[row][index] = toMonomial(toPower(matCopy[row][index]) * -1);
-      }
+function updateInternalMatrixNeg(index) {
+  // if (direction == 'col') {
+  for (let row=0; row < matCopy.length; row++) {
+    if (matCopy[row][index] != "0") {
+      matCopy[row][index] = toMonomial(toPower(matCopy[row][index]) * -1);
     }
-    if (nextMatrix != null) {
-      row = nextMatrix[index];
-      for (let i = 0; i < row.length; i++) {
-        if (row[i] != "0") {
-          row[i] = toMonomial(toPower(row[i]) * -1);
-        }
-      }
-    }
-  } else if (direction == 'row') {
-    for (let col=0; col < matCopy[0].length; col++) {
-      if (matCopy[index][col] != "0") {
-        matCopy[index][col] = toMonomial(toPower(matCopy[index][col]) * -1);
-      }
-    }
-    if (prevMatrix != null) {
-      for (let row = 0; row < prevMatrix.length; row++) {
-        if (prevMatrix[row][index] != "0") {
-          prevMatrix[row][index] = toMonomial(toPower(prevMatrix[row][index]) * -1);
-        }
+  }
+  if (nextMatrix != null) {
+    row = nextMatrix[index];
+    for (let i = 0; i < row.length; i++) {
+      if (row[i] != "0") {
+        row[i] = toMonomial(toPower(row[i]) * -1);
       }
     }
   }
+  // } else if (direction == 'row') {
+  //   for (let col=0; col < matCopy[0].length; col++) {
+  //     if (matCopy[index][col] != "0") {
+  //       matCopy[index][col] = toMonomial(toPower(matCopy[index][col]) * -1);
+  //     }
+  //   }
+  //   if (prevMatrix != null) {
+  //     for (let row = 0; row < prevMatrix.length; row++) {
+  //       if (prevMatrix[row][index] != "0") {
+  //         prevMatrix[row][index] = toMonomial(toPower(prevMatrix[row][index]) * -1);
+  //       }
+  //     }
+  //   }
+  // }
   // printMatrix();
 }
 
 // Update the Interal Matrix as you make changes
 // to the one on the table
-function updateInteralMatrixByRow(oldPos, newPos) {
-  temp = leftBettisCopy[oldPos];
-  leftBettisCopy.splice(oldPos, 1);
-  leftBettisCopy.splice(newPos, 0, temp);
+// function updateInteralMatrixByRow(oldPos, newPos) {
+//   temp = leftBettisCopy[oldPos];
+//   leftBettisCopy.splice(oldPos, 1);
+//   leftBettisCopy.splice(newPos, 0, temp);
 
-  temp = matCopy[oldPos];
-  matCopy.splice(oldPos, 1);
-  matCopy.splice(newPos, 0, temp);
+//   temp = matCopy[oldPos];
+//   matCopy.splice(oldPos, 1);
+//   matCopy.splice(newPos, 0, temp);
 
-  if (prevMatrix != null) {
-    for (let row=0; row < prevMatrix.length; row++){
-      temp = prevMatrix[row][oldPos];
-      prevMatrix[row].splice(oldPos, 1);
-      prevMatrix[row].splice(newPos, 0, temp);
-    }
-  }
+//   if (prevMatrix != null) {
+//     for (let row=0; row < prevMatrix.length; row++){
+//       temp = prevMatrix[row][oldPos];
+//       prevMatrix[row].splice(oldPos, 1);
+//       prevMatrix[row].splice(newPos, 0, temp);
+//     }
+//   }
 
-  // printMatrix();
-}
+//   // printMatrix();
+// }
 
 // Update the Interal Matrix as you make changes
 // to the one on the table
@@ -599,7 +597,7 @@ function updateInteralMatrixByCol(oldPos, newPos) {
   // printMatrix();
 }
 
-function updateInternalMatrixByRowAdder(oldPos, newPos) {
+// function updateInternalMatrixByRowAdder(oldPos, newPos) {
   // let draggedRow = matCopy[oldPos];
   // let targetRow = matCopy[newPos];
   // let draggedBetti = parseInt(leftBettisCopy[oldPos]);
@@ -617,7 +615,7 @@ function updateInternalMatrixByRowAdder(oldPos, newPos) {
   //   i++;
   // }
   // printMatrix();
-}
+// }
 
 function updateInteralMatrixByColAdder(oldPos, newPos) {
   let draggedBetti = parseInt(topBettisCopy[oldPos]);
@@ -724,8 +722,6 @@ function updateMatrix() {
     });
   }
   // printMatrix();
-  console.log(matrices);
-  console.log(allGradedDegrees);
 }
 
 function range(start, stop) {
