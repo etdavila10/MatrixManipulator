@@ -40,7 +40,7 @@ let scalar;
 // and the matrix will be generated for the matrix in
 // the textarea
 $(document).ready(function() {
-  updatedReadInput();
+  readInput();
   generateMatrix();
   // readAndGenerateMatrix();
   $(document).keydown(function(event) {
@@ -63,7 +63,7 @@ $(document).ready(function() {
 //   gradedDegreesTop = $("#gradedDegsTop").val().trim().split(/\s/);
 // }
 
-function updatedReadInput() {
+function readInput() {
   finalOutput = [];
   raw = $("#read-matrix").val();
   lines = raw.split(/\n/);
@@ -109,6 +109,7 @@ function updatedReadInput() {
 
 function generateMatrix() {
   let index = parseInt($("#matrix-index").val());
+  $('#matrix-num').html("Currently Manipulating Matrix " + index)
   matIndex = index;
   if (index <= 0 || index > matrices.length) {
     alert("Choose an actual index");
